@@ -10,7 +10,7 @@ Terraform provider for Dell Isilon (OneFS) API.
 ## Documentation
 
 * [Provider documentation](./website/docs/index.md)
-* [Resources documentation](./website/docs/resources)
+* [Resources documentation](./website/docs/r)
 
 ## Scope
 
