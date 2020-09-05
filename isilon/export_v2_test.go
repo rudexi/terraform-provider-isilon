@@ -77,6 +77,7 @@ resource "isilon_volume_v1" "mydir3" {
 resource "isilon_export_v2" "myexport3" {
     paths   = [ isilon_volume_v1.mydir3.absolute_path ]
     clients = ["192.168.1.10", "192.168.1.11"]
+    root_clients = ["192.168.1.10", "192.168.1.11"]
 }
 `
 
@@ -96,6 +97,8 @@ func TestAccExportUpdate(t *testing.T) {
                     testAccCheckResourceExists("isilon_export_v2.myexport3"),
                     resource.TestCheckResourceAttr("isilon_export_v2.myexport3", "clients.0", "192.168.1.10"),
                     resource.TestCheckResourceAttr("isilon_export_v2.myexport3", "clients.1", "192.168.1.11"),
+                    resource.TestCheckResourceAttr("isilon_export_v2.myexport3", "root_clients.0", "192.168.1.10"),
+                    resource.TestCheckResourceAttr("isilon_export_v2.myexport3", "root_clients.1", "192.168.1.11"),
                 ),
             },
         },

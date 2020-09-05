@@ -44,6 +44,11 @@ func export_v2() *schema.Resource {
                 Optional: true,
                 Elem: &schema.Schema{ Type: schema.TypeString },
             },
+            "root_clients": &schema.Schema{
+                Type: schema.TypeList,
+                Optional: true,
+                Elem: &schema.Schema{ Type: schema.TypeString },
+            },
         },
     }
 }
@@ -71,9 +76,18 @@ func createExportv2 (ctx context.Context, d *schema.ResourceData, meta interface
         real_clients = expandElements(clients.([]interface{}))
     }
 
+    root_clients, ok := d.GetOk("root_clients")
+    var real_root_clients []string
+    if !ok {
+        real_root_clients = []string{}
+    } else {
+        real_root_clients = expandElements(root_clients.([]interface{}))
+    }
+
     export := &v2.Export{
         Paths: &paths,
         Clients: &real_clients,
+        RootClients: &real_root_clients,
     }
 
     if export.Paths != nil && len(*export.Paths) == 0 {
@@ -137,10 +151,19 @@ func updateExportv2 (ctx context.Context, d *schema.ResourceData, meta interface
         real_clients = expandElements(clients.([]interface{}))
     }
 
+    root_clients, ok := d.GetOk("root_clients")
+    var real_root_clients []string
+    if !ok {
+        real_root_clients = []string{}
+    } else {
+        real_root_clients = expandElements(root_clients.([]interface{}))
+    }
+
     export := &v2.Export{
         ID: id,
         Paths: &paths,
         Clients: &real_clients,
+        RootClients: &real_root_clients,
     }
 
     zone := d.Get("zone").(string)

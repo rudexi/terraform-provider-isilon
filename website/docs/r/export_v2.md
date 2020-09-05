@@ -25,6 +25,8 @@ resource "isilon_export_v2" "myexport" {
 * `zone` - (Optional) The access zone of the NFS export. If ommited,
 Isilon will select the default access zone
 * `clients` (Optional) An array of IPs representing the allowed clients
+* `clients` (Optional) An array of IPs representing the allowed clients which
+will be mapped as root for the export
 
 ## Import
 
