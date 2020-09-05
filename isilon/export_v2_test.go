@@ -33,3 +33,71 @@ func TestAccExportCreate(t *testing.T) {
         },
     })
 }
+
+var testAccExportConfigClients = `
+resource "isilon_volume_v1" "mydir2" {
+    path = "mydir2"
+}
+
+resource "isilon_export_v2" "myexport2" {
+    paths   = [ isilon_volume_v1.mydir2.absolute_path ]
+    clients = ["192.168.1.10", "192.168.1.11"]
+}
+`
+
+func TestAccExportCreateClient(t *testing.T) {
+    resource.Test(t, resource.TestCase{
+        Providers: testAccProviders,
+        Steps: []resource.TestStep{
+            {
+                Config: testAccExportConfigClients,
+                Check: resource.ComposeTestCheckFunc(
+                    testAccCheckResourceExists("isilon_export_v2.myexport2"),
+                ),
+            },
+        },
+    })
+}
+
+var testAccExportUpdate1 = `
+resource "isilon_volume_v1" "mydir3" {
+    path = "mydir3"
+}
+
+resource "isilon_export_v2" "myexport3" {
+    paths   = [ isilon_volume_v1.mydir3.absolute_path ]
+}
+`
+
+var testAccExportUpdate2 = `
+resource "isilon_volume_v1" "mydir3" {
+    path = "mydir3"
+}
+
+resource "isilon_export_v2" "myexport3" {
+    paths   = [ isilon_volume_v1.mydir3.absolute_path ]
+    clients = ["192.168.1.10", "192.168.1.11"]
+}
+`
+
+func TestAccExportUpdate(t *testing.T) {
+    resource.Test(t, resource.TestCase{
+        Providers: testAccProviders,
+        Steps: []resource.TestStep{
+            {
+                Config: testAccExportUpdate1,
+                Check: resource.ComposeTestCheckFunc(
+                    testAccCheckResourceExists("isilon_export_v2.myexport3"),
+                ),
+            },
+            {
+                Config: testAccExportUpdate2,
+                Check: resource.ComposeTestCheckFunc(
+                    testAccCheckResourceExists("isilon_export_v2.myexport3"),
+                    resource.TestCheckResourceAttr("isilon_export_v2.myexport3", "clients.0", "192.168.1.10"),
+                    resource.TestCheckResourceAttr("isilon_export_v2.myexport3", "clients.1", "192.168.1.11"),
+                ),
+            },
+        },
+    })
+}

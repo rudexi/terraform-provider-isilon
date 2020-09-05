@@ -24,6 +24,7 @@ resource "isilon_export_v2" "myexport" {
 * `paths` - (Required) An array of absolute paths of the directories to export
 * `zone` - (Optional) The access zone of the NFS export. If ommited,
 Isilon will select the default access zone
+* `clients` (Optional) An array of IPs representing the allowed clients
 
 ## Import
 

@@ -39,16 +39,21 @@ func export_v2() *schema.Resource {
                 ForceNew: true,
                 Default: "",
             },
+            "clients": &schema.Schema{
+                Type: schema.TypeList,
+                Optional: true,
+                Elem: &schema.Schema{ Type: schema.TypeString },
+            },
         },
     }
 }
 
-func expandPaths(paths []interface{}) []string {
-    var str_paths []string
-    for _, path := range paths {
-        str_paths = append(str_paths, path.(string))
+func expandElements(elements []interface{}) []string {
+    var output_elements []string
+    for _, element := range elements {
+        output_elements = append(output_elements, element.(string))
     }
-    return str_paths
+    return output_elements
 }
 
 func createExportv2 (ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
@@ -56,11 +61,19 @@ func createExportv2 (ctx context.Context, d *schema.ResourceData, meta interface
 
     var diags diag.Diagnostics
 
-    p := d.Get("paths").([]interface{})
-    paths := expandPaths(p)
+    paths := expandElements(d.Get("paths").([]interface{}))
+
+    clients, ok := d.GetOk("clients")
+    var real_clients []string
+    if !ok {
+        real_clients = []string{}
+    } else {
+        real_clients = expandElements(clients.([]interface{}))
+    }
 
     export := &v2.Export{
         Paths: &paths,
+        Clients: &real_clients,
     }
 
     if export.Paths != nil && len(*export.Paths) == 0 {
@@ -101,6 +114,7 @@ func readExportv2 (ctx context.Context, d *schema.ResourceData, meta interface{}
     if err != nil { return diag.FromErr(err) }
 
     d.Set("paths", export.Paths)
+    d.Set("clients", export.Clients)
 
     return diags
 }
@@ -111,10 +125,22 @@ func updateExportv2 (ctx context.Context, d *schema.ResourceData, meta interface
     var diags diag.Diagnostics
 
     id, err := strconv.Atoi(d.Id())
+    if err != nil { return diag.FromErr(err) }
+
+    paths := expandElements(d.Get("paths").([]interface{}))
+
+    clients, ok := d.GetOk("clients")
+    var real_clients []string
+    if !ok {
+        real_clients = []string{}
+    } else {
+        real_clients = expandElements(clients.([]interface{}))
+    }
 
     export := &v2.Export{
         ID: id,
-        Paths: d.Get("paths").(*[]string),
+        Paths: &paths,
+        Clients: &real_clients,
     }
 
     zone := d.Get("zone").(string)
