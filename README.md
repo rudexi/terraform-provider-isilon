@@ -12,6 +12,26 @@ Terraform provider for Dell Isilon (OneFS) API.
 * [Provider documentation](./website/docs/index.md)
 * [Resources documentation](./website/docs/r)
 
+## Installation
+
+Since it's a community plugin, you need to indicate the terraform registry namespace.
+
+You're advised to put the following in your `versions.tf` (the default place
+in terraform 0.13 to define your provider and their version).
+
+```terraform
+# versions.tf
+terraform {
+    required_providers {
+        isilon = {
+            source = "rudexi/isilon"
+        }
+    }
+}
+```
+
+Then, run `terraform init` to download the latest version of the provider.
+
 ## Scope
 
 The following is supported:
